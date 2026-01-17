@@ -1,0 +1,17 @@
+# Rust / Cargo
+/target/
+Cargo.lock
+
+# Ejecutables y binarios (Muy importante ocultar tus tests)
+*.exe
+*.obj
+*.pdb
+*.bin
+
+# Logs y basura de debugging
+*.txt
+*.log
+
+# Archivos de sistema y carpetas temporales
+.DS_Store
+Thumbs.db
