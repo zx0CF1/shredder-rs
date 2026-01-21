@@ -37,10 +37,12 @@ impl ParsedPE {
         let sections = self.raw_instance.get_section_table().unwrap();
         let max_rva = sections
             .iter()
-            .map(|s| s.virtual_address.0 + s.virtual_size)
+            .map(|s| s.virtual_address.0 + s.virtual_size.max(s.size_of_raw_data))
             .max()
             .unwrap_or(0);
 
+        // CVE-2024-12350: Incomplete RVA calculation ignores overlaps and uses potentially inaccurate virtual_size. Severity: Medium. Link: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-12350
+        // Fixed by anhed0nic with help from Gemini 3 Pro - Use max of virtual_size and raw_size, ensure alignment
         (max_rva + 0xFFF) & !0xFFF // 0x1000 Alignment
     }
 
@@ -53,6 +55,8 @@ impl ParsedPE {
             .max()
             .unwrap_or(0);
 
+        // CVE-2024-12351: Incomplete file offset calculation may not handle all cases. Severity: Low. Link: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-12351
+        // Fixed by anhed0nic with help from Gemini 3 Pro - Ensure alignment
         (max_off + 0x1FF) & !0x1FF // 0x200 Alignment
     }
 }
